@@ -4,84 +4,58 @@
   crossorigin="anonymous"
 ></script>;
 
-$(document).ready(function () {
-  console.log(localStorage.getItem("propertyData"));
-  const listenForm = () => {
-    console.log("loaded");
+<script>
+  let propertyData = JSON.parse(localStorage.getItem("propertyData"));
 
-    // Check if propertyData exists in localStorage
-    let propertyData = JSON.parse(localStorage.getItem("propertyData")) || {};
+  $(document).ready(function () {
+    console.log(JSON.stringify(propertyData));
 
-    // Initialize form fields with propertyData if it exists
-    if (propertyData) {
-      document.querySelector('input[name="surface"]').value =
-        propertyData.surface || "";
-      document.querySelector('input[name="etage"]').value =
-        propertyData.floor || "";
-      document.querySelector('input[name="annee"]').value =
-        propertyData.constructionYear || "";
-      document.querySelector("#dpe").value =
-        propertyData.energyConsumptionLetter || "";
-      document.querySelector('input[name="pieces"]').value =
-        propertyData.floorCount || "";
-      document.querySelector('input[name="balcon-switch"]').checked =
-        propertyData.balconyCount === "1";
-      document.querySelector('input[name="jardin-switch"]').checked =
-        propertyData.gardenCount === "1";
-      document.querySelector('input[name="cave-switch"]').checked =
-        propertyData.cellarCount === "1";
-      document.querySelector('input[name="parking-switch"]').checked =
-        propertyData.parkingCount === "1";
+    if (propertyData != null) {
+      populateForm();
+    } else {
+       window.location.href = "https://lp.sergic.com/nile-test-lp/";
     }
+  });
 
-    const form = document.querySelector("#propertyData");
-    console.log(form);
-    console.log(localStorage.getItem("propertyData"));
 
-    // Add event listener on form submit
-    form.addEventListener("submit", (e) => {
-      e.preventDefault(); // Prevent the default form submission
+  $(document).on("click", "#previous", function(){
+    window.location.href = "https://lp.sergic.com/nile-test-lp";
+  });
 
-      let propertyData = {
-        surface: document.querySelector('input[name="surface"]')?.value,
-        floor: document.querySelector('input[name="etage"]')?.value,
-        constructionYear: document.querySelector('input[name="annee"]')?.value,
-        energyConsumptionLetter: document.querySelector("#dpe").value,
-        floorCount: document.querySelector('input[name="pieces"]')?.value,
-        balconyCount: document.querySelector('input[name="balcon-switch"]')
-          ?.checked
-          ? "1"
-          : "0",
-        gardenCount: document.querySelector('input[name="jardin-switch"]')
-          ?.checked
-          ? "1"
-          : "0",
-        cellarCount: document.querySelector('input[name="cave-switch"]')
-          ?.checked
-          ? "1"
-          : "0",
-        parkingCount: document.querySelector('input[name="parking-switch"]')
-          ?.checked
-          ? "1"
-          : "0",
-        roomCount: document.querySelector('input[name="pieces"]')?.value,
-      };
 
-      console.log(propertyData);
-      localStorage.setItem("propertyData", JSON.stringify(propertyData));
-      console.log(localStorage.getItem("propertyData"));
+  $(document).on("click", '.btnSubmit', function(e){
+    e.preventDefault(); // Prevent the default form submission
+    propertyData.surface = $('input[name="surface"]').val();
+    propertyData.floor = $('input[name="etage"]').val();
+    propertyData.constructionYear = $('input[name="annee"]').val();
+    propertyData.energyConsumptionLetter = $("#dpe").val();
+    propertyData.roomCount = $('input[name="pieces"]').val();
+    propertyData.balconyCount = $('input[name="balcon-switch"]').is(":checked") ? "1" : "0";
+    propertyData.gardenCount = $('input[name="jardin-switch"]').is(":checked") ? "1" : "0";
+    propertyData.cellarCount = $('input[name="cave-switch"]').is(":checked") ? "1" : "0";
+    propertyData.parkingCount = $('input[name="parking-switch"]').is(":checked") ? "1" : "0";
+    propertyData.floorCount = $('input[name="pieces"]').val();
 
-      window.location.href = "https://lp.sergic.com/nile-test-lp-3";
-    });
+    console.log(propertyData);
+    localStorage.setItem("propertyData", JSON.stringify(propertyData));
+    console.log(JSON.parse(localStorage.getItem("propertyData")));
+    window.location.href = "https://lp.sergic.com/nile-test-lp-3";
+  });
+
+
+  const populateForm = () => {      
+    $('input[name="surface"]').val(propertyData.surface);
+    $('input[name="etage"]').val(propertyData.floor);
+    $('input[name="annee"]').val(propertyData.constructionYear);
+    $("#dpe").val(propertyData.energyConsumptionLetter);
+    $('input[name="pieces"]').val(propertyData.roomCount);
+    $('input[name="etages"]').val(propertyData.floorCount);
+
+    
+    //Invert
+    if ($('input[name="balcon-switch"]').is(":checked")) { propertyData.balconyCount === "1" };
+    if ($('input[name="jardin-switch"]').is(":checked")) { propertyData.gardenCount === "1" };
+    if ($('input[name="cave-switch"]').is(":checked")) { propertyData.cellarCount === "1" };
+    if ($('input[name="parking-switch"]').is(":checked")) { propertyData.parkingCount === "1" };
   };
-
-  // Handle "Précédent" button click
-  document
-    .querySelector('button[type="button"]')
-    .addEventListener("click", () => {
-      window.location.href = "https://lp.sergic.com/nile-test-lp";
-    });
-
-  // Call the function when the page loads
-  listenForm();
-});
+</script>
