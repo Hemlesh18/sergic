@@ -4,7 +4,6 @@
   crossorigin="anonymous"
 ></script>;
 
-<script>
 $(document).ready(function () {
   const apiURL = `https://hook.eu2.make.com/jbrw6njnlogf7ses3m5847qfqiqk29a9`;
 
@@ -38,10 +37,11 @@ $(document).ready(function () {
     city: "",
   };
 
-
   if (localStorage.getItem("propertyData") != null) {
     propertyData = JSON.parse(localStorage.getItem("propertyData"));
 
+    let addressComponents = propertyData.address.split(",");
+    propertyData.address = addressComponents[0];
     $('#lp-pom-form-126 input[name="adresse"]').val(propertyData.address);
     $('#lp-pom-form-126 input[name="code_postal"]').val(propertyData.zip);
     $('#lp-pom-form-126 input[name="ville"]').val(propertyData.city);
@@ -54,10 +54,12 @@ $(document).ready(function () {
   }
 
   const openAddressModalSelection = (result) => {
-    var selectOptions = '<option value="">Veuillez choisir votre adresse</option>';
+    var selectOptions =
+      '<option value="">Veuillez choisir votre adresse</option>';
     if (Array.isArray(result)) {
       result.forEach(function (item) {
-        selectOptions += '<option value="' + item.Id + '">' + item.Adresse + "</option>";
+        selectOptions +=
+          '<option value="' + item.Id + '">' + item.Adresse + "</option>";
       });
     } else {
       console.error("Result is not an array");
@@ -69,12 +71,15 @@ $(document).ready(function () {
       x.remove();
     }
 
-    var modalContent = `
+    var modalContent =
+      `
       <div id="resultModal" class="modal">
           <div class="modal-content">
               <span class="close">&times;</span>
-              <h2>Results</h2>
-              <select id="resultSelect">` + selectOptions + `</select>
+              <h2 class="resultTitle">Veuillez choisir votre adresse</h2>
+              <select id="resultSelect">` +
+      selectOptions +
+      `</select>
           </div>
       </div>`;
 
@@ -84,13 +89,22 @@ $(document).ready(function () {
     // Show the modal
     var modal = $("#resultModal");
     modal.show();
-  }
-  
-  $("#lp-pom-button-127").click(function (event) {
-    event.preventDefault(); 
+  };
+
+  // Change the event listener to button click instead of form submission
+  $(document).on("submit", "#lp-pom-form-126 form", function (event) {
+    var address = $('#lp-pom-form-126 input[name="adresse"]').val();
+    var zip = $('#lp-pom-form-126 input[name="code_postal"]').val();
+    var city = $('#lp-pom-form-126 input[name="ville"]').val();
+
+    var addressValue = address + ", " + zip + ", " + city;
+
+    event.preventDefault();
+
+    console.log("Address value:", addressValue); // Debugging statement
 
     var formData = {
-      Valeur: String($('#lp-pom-form-126 input[name="adresse"]').val()),
+      Valeur: String(addressValue),
       Pays: "FR",
       Cnt: 3,
       AvecCAdrs: true,
@@ -106,7 +120,11 @@ $(document).ready(function () {
         console.log(result);
 
         // Check and parse the result if necessary
-        if (typeof result === "string" && result.length > 0 && result !== "Accepted") {
+        if (
+          typeof result === "string" &&
+          result.length > 0 &&
+          result !== "Accepted"
+        ) {
           result = JSON.parse(result);
           openAddressModalSelection(result);
         } else {
@@ -143,12 +161,12 @@ $(document).ready(function () {
         console.log(response);
 
         // Parse the response and update localStorage
-        if (1 === 1) {
+        if (response) {
           var res = JSON.parse(response); // Assuming the first object is what we need
           console.log(res);
           var resultData = res[0];
           var propertyType = $("#type_de_bien_").val();
-         
+
           // Update the propertyData object
           propertyData.lat = resultData.Y;
           propertyData.lng = resultData.X;
@@ -176,7 +194,7 @@ $(document).ready(function () {
   $("#newButton").hide();
 
   // Close the modal when the close button is clicked
-  $(document).on("change", '.close', function(){
+  $(document).on("click", ".close", function () {
     $("#resultModal").remove();
   });
 
@@ -187,9 +205,8 @@ $(document).ready(function () {
     }
   });
 
-    // Listen for changes on the select element
-  $(document).on("change", '#resultSelect', function(){
-
+  // Listen for changes on the select element
+  $(document).on("change", "#resultSelect", function () {
     // Get the selected option
     var selectedOption = $(this).children("option:selected");
     // Extract data from the selected option
@@ -207,9 +224,7 @@ $(document).ready(function () {
     };
     // Update the form with the new object data
     $('#lp-pom-form-126 input[name="adresse"]').val(newObject.adresse);
-    $('#lp-pom-form-126 input[name="code_postal"]').val(
-      newObject.code_postal
-    );
+    $('#lp-pom-form-126 input[name="code_postal"]').val(newObject.code_postal);
     $('#lp-pom-form-126 input[name="ville"]').val(newObject.ville);
     var sendData = {
       Id: id,
@@ -219,7 +234,7 @@ $(document).ready(function () {
     };
 
     // Close the modal after selecting an address
-    $('#resultModal').remove();
+    $("#resultModal").remove();
 
     // Save the selected data for later use
     selectedData = sendData;
@@ -229,5 +244,3 @@ $(document).ready(function () {
     $("#newButton").show();
   });
 });
-
-</script>

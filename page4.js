@@ -4,36 +4,38 @@
   crossorigin="anonymous"
 ></script>;
 
-console.log("Hello");
+let estimation = JSON.parse(localStorage.getItem("estimation"));
 
 $(document).ready(function () {
-  if (localStorage.getItem("estimation") != null) {
-    var estimation = JSON.parse(localStorage.getItem("estimation"));
-    console.log(estimation);
-    var finalData = {
-      estimation: "",
-      percentiles: "",
-      reliability: "",
-    };
-
-    finalData["estimation"] = estimation["estimation"]["value"];
-    finalData["percentiles"] =
-      estimation["estimation"]["percentiles"]["25.0"].toFixed(2) +
-      " - " +
-      estimation["estimation"]["percentiles"]["75.0"].toFixed(2);
-    finalData["reliability"] = estimation["reliability"]["score"];
-
-    $("#estimation").html(finalData["estimation"]);
-    $("#percentiles").html(finalData["percentiles"]);
-    $("#reliability").html(finalData["reliability"]);
-    console.log("Done");
-    console.log(finalData);
+  if (estimation != null) {
+    showEstimation();
+  } else {
+    window.location.href = "https://lp.sergic.com/nile-test-lp/";
   }
+});
 
-  console.log("After Done");
+const showEstimation = () => {
+  var finalData = {
+    estimation: "",
+    percentiles: "",
+    reliability: "",
+  };
 
-  $("#lp-pom-button-308").click(function () {
-    localStorage.clear();
-    console.log("LocalStorage cleared.");
-  });
+  finalData["estimation"] = estimation["estimation"]["value"];
+  finalData["percentiles"] =
+    estimation["estimation"]["percentiles"]["25.0"].toFixed(2) +
+    " - " +
+    estimation["estimation"]["percentiles"]["75.0"].toFixed(2);
+  finalData["reliability"] = estimation["reliability"]["score"];
+
+  $("#estimation").html(finalData["estimation"]);
+  $("#percentiles").html(finalData["percentiles"]);
+  $("#reliability").html(finalData["reliability"]);
+  console.log("Done");
+  console.log(finalData);
+  localStorage.clear();
+};
+
+$(document).on("click", "#lp-pom-button-308", function () {
+  window.location.href = "https://lp.sergic.com/nile-test-lp/";
 });

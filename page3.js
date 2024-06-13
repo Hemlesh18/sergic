@@ -4,73 +4,77 @@
   crossorigin="anonymous"
 ></script>;
 
-console.log("Hello");
+let propertyData = JSON.parse(localStorage.getItem("propertyData"));
+const apiURL = `https://hook.eu2.make.com/jbrw6njnlogf7ses3m5847qfqiqk29a9`;
 
 $(document).ready(function () {
-  let selectedData = {};
-  if (localStorage.getItem("propertyData") != null) {
-    propertyData = JSON.parse(localStorage.getItem("propertyData"));
-    $('#lp-pom-form-126 input[id="prénom"]').val(propertyData.firstName);
-    $('#lp-pom-form-126 input[id="nom"]').val(propertyData.lastName);
-    $('#lp-pom-form-126 input[id="email"]').val(propertyData.email);
-    $('#lp-pom-form-126 input[id="numéro_de_téléphone"]').val(
-      propertyData.mobilePhoneNumber
-    );
+  if (propertyData != null) {
+    populateForm();
   } else {
-    localStorage.setItem("propertyData", JSON.stringify(propertyData));
+    window.location.href = "https://lp.sergic.com/nile-test-lp/";
+  }
+});
+
+const populateForm = () => {
+  $('#lp-pom-form-126 input[id="prénom"]').val(propertyData.firstName);
+  $('#lp-pom-form-126 input[id="nom"]').val(propertyData.lastName);
+  $('#lp-pom-form-126 input[id="email"]').val(propertyData.email);
+  $('#lp-pom-form-126 input[id="numéro_de_téléphone"]').val(
+    propertyData.mobilePhoneNumber
+  );
+};
+
+$(document).on("submit", "#lp-pom-form-126 form", function (event) {
+  propertyData.firstName = $('#lp-pom-form-126 input[name="prénom"]').val();
+  propertyData.lastName = $('#lp-pom-form-126 input[id="nom"]').val();
+  propertyData.email = $('#lp-pom-form-126 input[id="email"]').val();
+  propertyData.mobilePhoneNumber = $(
+    '#lp-pom-form-126 input[id="numéro_de_téléphone"]'
+  ).val();
+
+  if (propertyData.propertyType === "Appartement") {
+    propertyData.propertyType = "APARTMENT";
+  } else if (propertyData.propertyType === "Maison") {
+    propertyData.propertyType = "HOUSE";
   }
 
-  $("#lp-pom-button-127").click(function (event) {
-    event.preventDefault(); // Prevent the default form submission
+  if (propertyData.generalState === "À rafraîchir") {
+    propertyData.generalState = "NORMAL";
+  } else if (propertyData.generalState === "Neuf") {
+    propertyData.generalState = "VERY_GOOD";
+  } else if (propertyData.generalState === "Bon état") {
+    propertyData.generalState = "GOOD";
+  } else if (propertyData.generalState === "Refait à neuf") {
+    propertyData.generalState = "NEW";
+  }
 
-    var formData = {
-      firstName: String($('#lp-pom-form-126 input[name="prénom"]')?.val()),
-      lastName: String($('#lp-pom-form-126 input[id="nom"]')?.val()),
-      email: String($('#lp-pom-form-126 input[id="email"]')?.val()),
-      mobilePhoneNumber: $(
-        '#lp-pom-form-126 input[id="numéro_de_téléphone"]'
-      )?.val(),
-    };
+  event.preventDefault();
 
-    console.log(JSON.stringify(formData));
+  localStorage.setItem("propertyData", JSON.stringify(propertyData));
+  console.log("LocalStorage updated with new lat and lng.");
+  console.log(localStorage.getItem("propertyData"));
 
-    var propertyData = JSON.parse(localStorage.getItem("propertyData"));
+  $.ajax({
+    type: "POST",
+    url: apiURL,
+    contentType: "application/json",
+    data: JSON.stringify(propertyData),
+    success: function (result) {
+      console.log("Data successfully sent to another API.");
+      console.log(result);
 
-    propertyData.firstName = formData.firstName;
-
-    propertyData.lastName = formData.lastName;
-    propertyData.email = formData.email;
-    propertyData.mobilePhoneNumber = formData.mobilePhoneNumber;
-
-    localStorage.setItem("propertyData", JSON.stringify(propertyData));
-    console.log("LocalStorage updated with new lat and lng.");
-    console.log(localStorage.getItem("propertyData"));
-
-    const sendToMake = propertyData;
-
-    // Send data to another API
-    $.ajax({
-      type: "POST",
-      url: "https://hook.eu2.make.com/jbrw6njnlogf7ses3m5847qfqiqk29a9",
-      contentType: "application/json",
-      data: JSON.stringify(sendToMake),
-      success: function (result) {
-        console.log("Data successfully sent to another API.");
-        console.log(result);
-
-        let estimationResponse = result;
-        localStorage.setItem("estimation", estimationResponse);
-        console.log(localStorage.getItem("estimation"));
-        window.location.href = "https://lp.sergic.com/nile-test-lp-4/";
-      },
-      error: function (error) {
-        console.log("An error occurred:");
-        console.log(error);
-      },
-    });
+      let estimationResponse = result;
+      localStorage.setItem("estimation", estimationResponse);
+      console.log(localStorage.getItem("estimation"));
+      window.location.href = "https://lp.sergic.com/nile-test-lp-4/";
+    },
+    error: function (error) {
+      console.log("An error occurred:");
+      console.log(error);
+    },
   });
+});
 
-  $(".buttons button").click(function () {
-    window.location.href = "https://lp.sergic.com/nile-test-lp-2/"; // Replace with your desired URL
-  });
+$(document).on("click", ".buttons button", function () {
+  window.location.href = "https://lp.sergic.com/nile-test-lp-2/"; // Replace with your desired URL
 });
